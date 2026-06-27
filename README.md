@@ -1,6 +1,6 @@
-# 💰 Menaxhues Shpenzimesh
+# Menaxhues Shpenzimesh
 
-Aplikacion web për gjurmimin e shpenzimeve personale ditore.
+Aplikacion web për gjurmimin e shpenzimeve personale.
 
 ## Stack
 - **Frontend:** HTML, CSS, Vanilla JavaScript
