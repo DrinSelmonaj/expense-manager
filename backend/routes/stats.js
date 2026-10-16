@@ -1,6 +1,7 @@
 const express = require('express');
 const router  = express.Router();
 const pool    = require('../db');
+const { isValidDate } = require('../validation');
 
 // ─── GET /api/stats/daily ──────────────────────────────
 // Shpenzimet ditore — 30 ditët e fundit (për bar chart)
@@ -56,6 +57,9 @@ router.get('/range', async (req, res) => {
 
   if (!from || !to) {
     return res.status(400).json({ error: 'Kërkohen parametrat "from" dhe "to"' });
+  }
+  if (!isValidDate(from) || !isValidDate(to)) {
+    return res.status(400).json({ error: 'Datat duhet të jenë në formatin YYYY-MM-DD' });
   }
 
   try {

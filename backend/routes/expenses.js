@@ -3,6 +3,7 @@ const router              = express.Router();
 const pool                = require('../db');
 // FIX: require i zhvendosur në krye, larg route definitions
 const { checkAndSendAlert } = require('../services/emailService');
+const { validateExpense, isPositiveInteger } = require('../validation');
 
 // ─── GET /api/expenses ─────────────────────────────────
 // Kthen të gjitha shpenzimet me emrin e kategorisë
@@ -23,24 +24,29 @@ router.get('/', async (req, res) => {
 // Body: { amount, description, category_id, expense_date }
 router.post('/', async (req, res) => {
   try {
-    const { amount, description, category_id, expense_date } = req.body;
-
-    if (!amount || amount <= 0) {
-      return res.status(400).json({ error: 'Shuma duhet të jetë më e madhe se 0' });
+    const { error, value } = validateExpense(req.body);
+    if (error) {
+      return res.status(400).json({ error });
     }
 
+    // COALESCE: nëse s'ka datë, DB vendos CURRENT_DATE (NULL eksplicit s'do
+    // të aktivizonte DEFAULT-in e kolonës, por do të shkelte NOT NULL)
     const result = await pool.query(
       `INSERT INTO expenses (amount, description, category_id, expense_date)
-       VALUES ($1, $2, $3, $4)
+       VALUES ($1, $2, $3, COALESCE($4::date, CURRENT_DATE))
        RETURNING *`,
-      [amount, description || null, category_id || null, expense_date || new Date()]
+      [value.amount, value.description, value.category_id, value.expense_date]
     );
 
-    // kontrollo limitin menjëherë pas shtimit
+    // kontrollo limitin menjëherë pas shtimit (dërgon max 1 email në muaj)
     checkAndSendAlert();
 
     res.status(201).json(result.rows[0]);
   } catch (err) {
+    // 23503 = foreign key violation — category_id s'ekziston
+    if (err.code === '23503') {
+      return res.status(400).json({ error: 'Kategoria nuk ekziston' });
+    }
     console.error(err.message);
     res.status(500).json({ error: 'Gabim në server' });
   }
@@ -51,6 +57,9 @@ router.post('/', async (req, res) => {
 router.delete('/:id', async (req, res) => {
   try {
     const { id } = req.params; // merr id nga URL: /api/expenses/5
+    if (!isPositiveInteger(id)) {
+      return res.status(400).json({ error: 'ID e pavlefshme' });
+    }
 
     const result = await pool.query(
       'DELETE FROM expenses WHERE id = $1 RETURNING *',

@@ -34,6 +34,13 @@ router.post('/', async (req, res) => {
     if (!email || !monthly_limit) {
       return res.status(400).json({ error: 'Email dhe limiti janë të detyrueshëm' });
     }
+    // kontroll bazë formati — s'garanton që adresa ekziston, vetëm që duket si email
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) || email.length > 100) {
+      return res.status(400).json({ error: 'Email i pavlefshëm' });
+    }
+    if (!Number.isFinite(Number(monthly_limit)) || Number(monthly_limit) <= 0) {
+      return res.status(400).json({ error: 'Limiti duhet të jetë numër më i madh se 0' });
+    }
 
     // INSERT ose UPDATE — nëse ekziston përditëso, nëse jo krijo
     const result = await pool.query(`
