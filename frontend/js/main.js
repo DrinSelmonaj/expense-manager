@@ -22,7 +22,7 @@ if (isAnalysisPage) {
     await initCharts(); // nga charts.js
 
     // default: muaji aktual
-    const today        = new Date().toISOString().split('T')[0];
+    const today        = todayLocal();
     const firstOfMonth = today.substring(0, 7) + '-01';
     document.getElementById('date-from').value = firstOfMonth;
     document.getElementById('date-to').value   = today;
@@ -41,7 +41,7 @@ if (isAnalysisPage) {
 if (!isAnalysisPage) {
   document.addEventListener('DOMContentLoaded', async () => {
     // vendos datën e sotme si default
-    document.getElementById('date').value = new Date().toISOString().split('T')[0];
+    document.getElementById('date').value = todayLocal();
 
     await loadCategories();
     await loadExpenses();
@@ -67,7 +67,7 @@ if (!isAnalysisPage) {
       });
       showMessage('Shpenzimi u shtua me sukses!');
       clearForm();
-      document.getElementById('date').value = new Date().toISOString().split('T')[0];
+      document.getElementById('date').value = todayLocal();
       await loadExpenses();
     } catch (err) {
       showMessage('Gabim gjatë shtimit të shpenzimit', 'error');

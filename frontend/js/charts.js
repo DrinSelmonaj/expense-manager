@@ -11,7 +11,7 @@ async function loadTrendChart(period = 'daily') {
 
   // përgatit labels dhe vlerat
   const labels = data.map(row => {
-    const date = new Date(row.expense_date || row.week_start || row.month);
+    const date = parseApiDate(row.expense_date || row.week_start || row.month);
     if (period === 'daily')   return date.toLocaleDateString('sq-AL', { day: '2-digit', month: '2-digit' });
     if (period === 'weekly')  return `Java ${date.toLocaleDateString('sq-AL', { day: '2-digit', month: '2-digit' })}`;
     if (period === 'monthly') return date.toLocaleDateString('sq-AL', { month: 'long', year: 'numeric' });
@@ -144,7 +144,7 @@ async function loadRangeCharts(from, to) {
 
   // ── Trend chart (bar) ──
   const labels = data.daily.map(row => {
-    const date = new Date(row.expense_date);
+    const date = parseApiDate(row.expense_date);
     return date.toLocaleDateString('sq-AL', { day: '2-digit', month: '2-digit' });
   });
   const values = data.daily.map(row => parseFloat(row.total_amount) || 0);

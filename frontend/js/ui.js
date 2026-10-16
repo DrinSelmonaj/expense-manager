@@ -26,19 +26,20 @@ function renderExpenses(expenses) {
     return;
   }
 
-  // krijo HTML për çdo shpenzim
+  // krijo HTML për çdo shpenzim — çdo tekst nga përdoruesi kalon nga escapeHtml()
+  // (utils.js), përndryshe një përshkrim me <tag> do të interpretohej si HTML
   list.innerHTML = expenses.map(exp => `
-    <div class="expense-item" data-id="${exp.id}">
+    <div class="expense-item" data-id="${Number(exp.id)}">
       <div class="expense-left">
-        <span class="expense-category" style="background:${exp.category_color || '#6b7280'}">
-          ${exp.category_name || 'Pa kategori'}
+        <span class="expense-category" style="background:${escapeHtml(exp.category_color || '#6b7280')}">
+          ${escapeHtml(exp.category_name || 'Pa kategori')}
         </span>
-        <span class="expense-desc">${exp.description || '-'}</span>
+        <span class="expense-desc">${escapeHtml(exp.description || '-')}</span>
         <span class="expense-date">${formatDate(exp.expense_date)}</span>
       </div>
       <div class="expense-right">
         <span class="expense-amount">€${parseFloat(exp.amount).toFixed(2)}</span>
-        <button class="btn-delete" onclick="handleDelete(${exp.id})">🗑</button>
+        <button class="btn-delete" onclick="handleDelete(${Number(exp.id)})">🗑</button>
       </div>
     </div>
   `).join('');
@@ -47,7 +48,7 @@ function renderExpenses(expenses) {
 // ─── STATISTIKAT ──────────────────────────────────────
 
 function renderStats(expenses) {
-  const today     = new Date().toISOString().split('T')[0]; // format: 2026-06-24
+  const today     = todayLocal(); // format: 2026-06-24
   const thisMonth = today.substring(0, 7);                  // format: 2026-06
 
   const totalToday = expenses
@@ -71,7 +72,7 @@ function renderStats(expenses) {
 // Konverto datën nga ISO format në format shqip
 function formatDate(dateStr) {
   if (!dateStr) return '-';
-  const date = new Date(dateStr);
+  const date = parseApiDate(dateStr);
   return date.toLocaleDateString('sq-AL', {
     day:   '2-digit',
     month: '2-digit',

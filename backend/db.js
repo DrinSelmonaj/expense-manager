@@ -1,6 +1,11 @@
 // db.js — lidhja me PostgreSQL
 // Kredencialet lexohen nga .env (require në server.js e ngarkoi dotenv)
-const { Pool } = require('pg');
+const { Pool, types } = require('pg');
+
+// Kolonat DATE (OID 1082) kthehen si tekst 'YYYY-MM-DD', jo si objekt Date.
+// PSE: pg i konverton në mesnatë lokale, JSON-i pastaj i dërgon në UTC —
+// 24 qershor dilte "2026-06-23T22:00:00Z" dhe "Totali sot" s'gjente asgjë.
+types.setTypeParser(1082, value => value);
 
 const pool = new Pool({
   host:     process.env.DB_HOST     || 'localhost',
