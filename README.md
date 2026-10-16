@@ -14,26 +14,34 @@ Aplikacion web për gjurmimin e shpenzimeve personale.
 - 8 kategori të para-ndërtuara me ngjyra
 
 ## Struktura
+```
 expense-manager/
-
 ├── backend/
 │   ├── routes/
+│   │   ├── alertConfig.js
 │   │   ├── categories.js
-│   │   └── expenses.js
+│   │   ├── expenses.js
+│   │   └── stats.js
+│   ├── services/
+│   │   └── emailService.js
 │   ├── db.js
 │   └── server.js
-└── frontend/
-├── css/style.css
-├── js/
-│   ├── api.js
-│   ├── ui.js
-│   └── main.js
-└── index.html
+├── frontend/
+│   ├── css/style.css
+│   ├── js/
+│   │   ├── api.js
+│   │   ├── charts.js
+│   │   ├── main.js
+│   │   └── ui.js
+│   ├── analysis.html
+│   └── index.html
+└── docs/          # screenshots
+```
 
 ## Instalimi
 ```bash
 # 1. Klono repon
-git clone https://github.com/d13ini/expense-manager.git
+git clone https://github.com/DrinSelmonaj/expense-manager.git
 
 # 2. Instalo dependencies
 cd expense-manager/backend
